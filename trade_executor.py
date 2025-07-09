@@ -4,10 +4,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def load_settings():
-    with open("config/settings.json", "r") as f:
-        return json.load(f)
-
 FILLING_MODES = {
     mt5.ORDER_FILLING_IOC: "IOC",
     mt5.ORDER_FILLING_FOK: "FOK",
@@ -22,8 +18,10 @@ def get_pip_value(symbol):
     return pip_size * info.trade_contract_size
 
 def price_to_pips(symbol, price_diff):
-    pip_size = 0.01 if symbol.endswith("JPY") else 0.0001
-    return abs(price_diff) / pip_size
+    info = mt5.symbol_info(symbol)
+    if info is None:
+        raise RuntimeError(f"❌ Symbol info not found: {symbol}")
+    return abs(price_diff) / info.point
 
 def calculate_R_value(entry, sl, tp):
     risk = abs(entry - sl)
@@ -42,7 +40,6 @@ def calculate_lot_size(symbol, sl_price, entry_price, risk_percent, balance):
     return max(round(lot_size, 2), 0.01)
 
 def execute_trade(trade):
-    settings = load_settings()
 
     symbol = trade["symbol"]
     direction = trade["direction"]

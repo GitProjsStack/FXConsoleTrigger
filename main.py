@@ -2,7 +2,7 @@ import os
 import time
 from dotenv import load_dotenv
 from mt5_init import mt5_init
-from trade_executor import execute_trade, load_settings
+from trade_executor import execute_trade
 
 def prompt_risk_percent(default_percent):
     user_input = input(f"Risk % (default {default_percent}%): ").strip()

@@ -46,7 +46,6 @@ def execute_trade(trade):
 
     symbol = trade["symbol"]
     direction = trade["direction"]
-    entry = trade["entry"]
     sl = trade["sl"]
     tp = trade["tp"]
     risk_percent = trade["risk_percent"]
@@ -58,7 +57,7 @@ def execute_trade(trade):
     if tick is None:
         raise RuntimeError(f"❌ No tick data for {symbol}")
 
-    is_buy = direction == "BUY"
+    is_buy = direction.upper() == "BUY"
     current_price = tick.ask if is_buy else tick.bid
     entry_price = current_price
 
@@ -72,16 +71,25 @@ def execute_trade(trade):
         raise RuntimeError("❌ Could not fetch account info.")
 
     balance = account_info.balance
-    max_spread_cost = settings.get("max_spread", 10.0)
-
     lot_size = calculate_lot_size(symbol, sl, entry_price, risk_percent, balance)
     spread_cost = spread_per_lot * lot_size
 
-    if spread_cost > max_spread_cost:
-        raise RuntimeError(f"❌ Spread cost too high: ${spread_cost:.2f}")
-    
-    execute_market_order(symbol, entry_price, sl, tp, is_buy, lot_size)
+    print(f"\n🔍 Trade Summary:")
+    print(f"Symbol       : {symbol}")
+    print(f"Direction    : {direction.upper()}")
+    print(f"Stop Loss    : {sl}")
+    print(f"Take Profit  : {tp}")
+    print(f"Lot Size     : {lot_size}")
+    print(f"Spread       : {spread_pips:.2f} pips")
+    print(f"Spread Cost  : ${spread_cost:.2f}")
 
+    # Ask for user approval
+    user_input = input("\n⚠️ Do you approve this spread cost? (y/n): ").strip().lower()
+    if user_input != "y":
+        print("❌ Trade cancelled by user.")
+        return
+
+    execute_market_order(symbol, entry_price, sl, tp, is_buy, lot_size)
 
 def execute_market_order(symbol, entry_price, sl, tp, is_buy, lot_size):
     direction = "BUY" if is_buy else "SELL"
@@ -94,7 +102,7 @@ def execute_market_order(symbol, entry_price, sl, tp, is_buy, lot_size):
             "price": entry_price,
             "sl": sl,
             "tp": tp,
-            "deviation": 1,
+            "deviation": 0,
             "comment": "FXConsoleTrigger",
             "type_time": mt5.ORDER_TIME_GTC,
             "type_filling": mode,

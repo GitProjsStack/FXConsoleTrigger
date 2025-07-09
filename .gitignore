@@ -1,6 +1,5 @@
 # ⛔ Sensitive files
 .env
-config/settings.json
 
 # 🐍 Python bytecode
 __pycache__/

@@ -23,7 +23,6 @@ def prompt_float(prompt_text):
 
 def main():
     load_dotenv()
-    settings = load_settings()
     mt5_init()
 
     while True:
@@ -39,7 +38,7 @@ def main():
 
         sl = prompt_float("Stop Loss price: ")
         tp = prompt_float("Take Profit price: ")
-        risk_percent = prompt_risk_percent(settings.get("risk_percent", 1.0))
+        risk_percent = prompt_risk_percent(default_percent=1.0)
 
         trade = {
             "symbol": symbol,

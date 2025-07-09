@@ -77,24 +77,9 @@ def execute_trade(trade):
     lot_size = calculate_lot_size(symbol, sl, entry_price, risk_percent, balance)
     spread_cost = spread_per_lot * lot_size
 
-    # 🔍 Print Debug Info
-    print("\n📊 DEBUG INFO")
-    print(f"🔸 Symbol            : {symbol}")
-    print(f"🔸 Direction         : {direction}")
-    print(f"🔸 Entry Price       : {entry_price}")
-    print(f"🔸 Stop Loss         : {sl}")
-    print(f"🔸 Take Profit       : {tp}")
-    print(f"🔸 Spread (raw)      : {spread}")
-    print(f"🔸 Spread (pips)     : {spread_pips:.2f}")
-    print(f"🔸 Pip Value         : ${pip_value:.5f}")
-    print(f"🔸 Spread per 1 lot  : ${spread_per_lot:.2f}")
-    print(f"🔸 Lot Size          : {lot_size}")
-    print(f"🔸 Spread Cost       : ${spread_cost:.2f}")
-    print(f"🔸 Max Spread Allowed: ${max_spread_cost:.2f}")
-
     if spread_cost > max_spread_cost:
         raise RuntimeError(f"❌ Spread cost too high: ${spread_cost:.2f}")
-
+    
     execute_market_order(symbol, entry_price, sl, tp, is_buy, lot_size)
 
 

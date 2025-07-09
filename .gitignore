@@ -1,0 +1,26 @@
+# ⛔ Sensitive files
+.env
+config/settings.json
+
+# 🐍 Python bytecode
+__pycache__/
+*.py[cod]
+*.pyo
+
+# 📦 Virtual environments
+.venv/
+env/
+venv/
+
+# 🛠️ IDE/editor settings
+.vscode/
+.idea/
+*.swp
+
+# 🪣 Logs, dumps
+*.log
+*.dump
+
+# 🚫 OS-specific
+.DS_Store
+Thumbs.db

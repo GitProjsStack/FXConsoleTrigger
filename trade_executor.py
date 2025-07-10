@@ -1,5 +1,4 @@
 import MetaTrader5 as mt5
-import json, os
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -69,22 +68,6 @@ def execute_trade(trade):
 
     balance = account_info.balance
     lot_size = calculate_lot_size(symbol, sl, entry_price, risk_percent, balance)
-    spread_cost = spread_per_lot * lot_size
-
-    print(f"\n🔍 Trade Summary:")
-    print(f"Symbol       : {symbol}")
-    print(f"Direction    : {direction.upper()}")
-    print(f"Stop Loss    : {sl}")
-    print(f"Take Profit  : {tp}")
-    print(f"Lot Size     : {lot_size}")
-    print(f"Spread       : {spread_pips:.2f} pips")
-    print(f"Spread Cost  : ${spread_cost:.2f}")
-
-    # Ask for user approval
-    user_input = input("\n⚠️ Do you approve this spread cost? (y/n): ").strip().lower()
-    if user_input != "y":
-        print("❌ Trade cancelled by user.")
-        return
 
     execute_market_order(symbol, entry_price, sl, tp, is_buy, lot_size)
 
@@ -117,7 +100,5 @@ def execute_market_order(symbol, entry_price, sl, tp, is_buy, lot_size):
             print(f"🔹 Take Profit   : {tp}")
             print(f"🔹 Lot Size      : {lot_size}")
             print(f"🔹 R-Value       : {r_value:.2f}")
-            print(f"🔹 Fill Mode     : {mode_name}")
-            print(f"🔹 Order ID      : {result.order}")
             return
     print("❌ All filling modes failed. Trade not executed.")

@@ -1,4 +1,5 @@
 import MetaTrader5 as mt5
+import json, os
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -38,6 +39,17 @@ def calculate_lot_size(symbol, sl_price, entry_price, risk_percent, balance):
     lot_size = risk_amount / (sl_pips * pip_value)
     return max(round(lot_size, 2), 0.01)
 
+def calculate_spread_cost(symbol, lot_size):
+    info = mt5.symbol_info(symbol)
+    tick = mt5.symbol_info_tick(symbol)
+    
+    if info is None or tick is None:
+        raise RuntimeError(f"Missing data for symbol: {symbol}")
+    
+    spread_in_points = tick.ask - tick.bid
+    spread_cost = spread_in_points * info.trade_contract_size * lot_size / info.point
+    return spread_cost
+
 def execute_trade(trade):
 
     symbol = trade["symbol"]
@@ -68,6 +80,15 @@ def execute_trade(trade):
 
     balance = account_info.balance
     lot_size = calculate_lot_size(symbol, sl, entry_price, risk_percent, balance)
+    spread_cost = calculate_spread_cost(symbol, lot_size)
+    
+    print(f"Spread Cost  : ${spread_cost:.2f}")
+
+    # Ask for user approval
+    user_input = input("\n⚠️ Do you approve this spread cost? (y/n): ").strip().lower()
+    if user_input != "y":
+        print("❌ Trade cancelled by user.")
+        return
 
     execute_market_order(symbol, entry_price, sl, tp, is_buy, lot_size)
 
@@ -100,5 +121,7 @@ def execute_market_order(symbol, entry_price, sl, tp, is_buy, lot_size):
             print(f"🔹 Take Profit   : {tp}")
             print(f"🔹 Lot Size      : {lot_size}")
             print(f"🔹 R-Value       : {r_value:.2f}")
+            print(f"🔹 Fill Mode     : {mode_name}")
+            print(f"🔹 Order ID      : {result.order}")
             return
     print("❌ All filling modes failed. Trade not executed.")
